@@ -21,7 +21,7 @@ def iter_lines(lines):
         yield lines.pop()
 
 
-class Dashboard(DashboardPlugin):
+class LogsDashboardPlugin(DashboardPlugin):
     # Translators, used as dashboard section title
     heading = _('Application logs')
     name = 'logs'
