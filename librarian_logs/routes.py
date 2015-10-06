@@ -29,9 +29,9 @@ def send_syslog():
 
 
 def routes(config):
-    app_name = config['app.name']
+    log_name = basename(config['logging.output'])
     opts = dict(no_i18n=True, unlocked=True, skip=config['app.skip_plugins'])
     return (
-        ('sys:app_log', send_applog, 'GET', '/{0}.log'.format(app_name), opts),
+        ('sys:applog', send_applog, 'GET', '/{0}'.format(log_name), opts),
         ('sys:syslog', send_syslog, 'GET', '/syslog', opts),
     )
