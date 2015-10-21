@@ -4,7 +4,7 @@ from os.path import basename, dirname, splitext
 
 from bottle import request, static_file
 
-from librarian_version.version import get_base_version
+from librarian_core.contrib.system.version import get_base_version
 
 
 def send_logfile(log_path):
