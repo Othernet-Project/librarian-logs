@@ -30,6 +30,7 @@ LIBRARIAN_LOGS = ('/var/log/librarian.log', '/mnt/data/log/librarian.log',)
 FSAL_LOG = ('/var/log/fsal.log', '/mnt/data/log/fsal.log',)
 SYSLOG = ('/var/log/syslog', '/var/log/messages')
 VERSION_FILE = '/etc/version'
+NO_LOGS = 'NO LOGS FOUND'
 
 
 # Helpers
@@ -71,6 +72,8 @@ def get_log(log_path='/var/log/syslog'):
     Return all entries from a log file. This includes any backup files found on
     the system.
     """
+    if not log_path:
+        return NO_LOGS
     return '\n'.join(read_file(p) for p in glob(log_path + '*'))
 
 
@@ -156,6 +159,8 @@ def get_network_data():
 
 
 def get_log_entries(log, kw):
+    if log == NO_LOGS:
+        return log
     return NL.join(grep(log, kw))
 
 
