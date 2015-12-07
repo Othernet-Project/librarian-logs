@@ -31,6 +31,7 @@ FSAL_LOG = ('/var/log/fsal.log', '/mnt/data/log/fsal.log',)
 SYSLOG = ('/var/log/syslog', '/var/log/messages')
 VERSION_FILE = '/etc/version'
 NO_LOGS = 'NO LOGS FOUND'
+ONDD_SOCKET = '/var/run/ondd.ctrl'
 
 
 # Helpers
@@ -67,14 +68,20 @@ def grep(s, keyword):
         yield l
 
 
-def get_log(log_path='/var/log/syslog'):
+def grep_file(path, keyword=None):
     """
-    Return all entries from a log file. This includes any backup files found on
-    the system.
+    Return only lines of a file which contains specified keyword.
     """
-    if not log_path:
-        return NO_LOGS
-    return '\n'.join(read_file(p) for p in glob(log_path + '*'))
+    if not path or not os.path.exists(path):
+        yield NO_LOGS
+        return
+    with open(path) as f:
+        if not keyword:
+            yield f.read()
+            return
+        for line in f:
+            if keyword in line:
+                yield line.strip()
 
 
 def section(name, contents):
@@ -158,17 +165,14 @@ def get_network_data():
     return shell('ip addr').strip()
 
 
-def get_log_entries(log, kw):
-    if log == NO_LOGS:
-        return log
-    return NL.join(grep(log, kw))
+def get_log(path, kw=None):
+    return NL.join(grep_file(path, kw))
 
 
 # Business end
 
-def generate_report(syslog, librarian_log, fsal_log):
+def generate_report(syslog, librarian_log, fsal_log, ondd_socket):
     start = time.time()
-    syslog = get_log(syslog)
     reports = []
     reports.append(section('Platform', get_platform_data()))
     reports.append(section('Memory', get_mem_data()))
@@ -176,10 +180,9 @@ def generate_report(syslog, librarian_log, fsal_log):
     reports.append(section('Kernel', get_dmesg()))
     reports.append(section('Storage', get_disk_data()))
     reports.append(section('Network', get_network_data()))
-    reports.append(section('ONDD', get_log_entries(syslog, 'ondd')))
-    reports.append(section('Hotplug', get_log_entries(syslog, 'hotplug')))
-    reports.append(section('Monitor',
-                           get_log_entries(syslog, 'outernet.monitor')))
+    reports.append(section('ONDD', get_log(syslog, 'ondd')))
+    reports.append(section('Hotplug', get_log(syslog, 'hotplug')))
+    reports.append(section('Monitor', get_log(syslog, 'outernet.monitor')))
     reports.append(section('Librarian', get_log(librarian_log)))
     reports.append(section('FSAL', get_log(fsal_log)))
     if os.path.exists('/tmp/setup'):
@@ -195,7 +198,8 @@ def main():
     syslog = find_first(SYSLOG)
     librarian_log = find_first(LIBRARIAN_LOGS)
     fsal_log = find_first(FSAL_LOG)
-    print(generate_report(syslog, librarian_log, fsal_log).encode('utf8'))
+    print(generate_report(
+        syslog, librarian_log, fsal_log, ONDD_SOCKET).encode('utf8'))
 
 
 if __name__ == '__main__':
