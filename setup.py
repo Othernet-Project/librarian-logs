@@ -26,6 +26,11 @@ setup(
         'git+ssh://git@github.com/Outernet-Project/librarian-core.git#egg=librarian_core-0.1',
         'git+ssh://git@github.com/Outernet-Project/librarian-dashboard.git#egg=librarian_dashboard-0.1',
     ],
+    entry_points={
+        'console_scripts': [
+            'diagnostics = librarian_logs.diagnostics:main',
+        ]
+    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Topic :: Applicaton',
