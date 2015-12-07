@@ -200,7 +200,7 @@ def main():
     librarian_log = find_first(LIBRARIAN_LOGS)
     fsal_log = find_first(FSAL_LOG)
     print(generate_report(
-        syslog, librarian_log, fsal_log, ONDD_SOCKET).encode('utf8'))
+        syslog, librarian_log, fsal_log, ONDD_SOCKET))
 
 
 if __name__ == '__main__':
