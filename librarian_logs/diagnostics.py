@@ -178,6 +178,7 @@ def generate_report(syslog, librarian_log, fsal_log, ondd_socket):
     reports.append(section('Memory', get_mem_data()))
     reports.append(section('Processes', get_proc_data()))
     reports.append(section('Kernel', get_dmesg()))
+    reports.append(section('Tuner', get_frontend_data()))
     reports.append(section('Storage', get_disk_data()))
     reports.append(section('Network', get_network_data()))
     reports.append(section('ONDD', get_log(syslog, 'ondd')))
