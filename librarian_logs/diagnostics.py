@@ -182,6 +182,8 @@ def generate_report(syslog, librarian_log, fsal_log):
                            get_log_entries(syslog, 'outernet.monitor')))
     reports.append(section('Librarian', get_log(librarian_log)))
     reports.append(section('FSAL', get_log(fsal_log)))
+    if os.path.exists('/tmp/setup'):
+        reports.append(section('Setup', get_log('/tmp/setup')))
     total_time = time.time() - start
     now = datetime.datetime.utcnow()
     reports.append('Generated at {}. Took {}ms.'.format(
