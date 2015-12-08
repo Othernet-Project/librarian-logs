@@ -72,7 +72,7 @@ def grep_file(path, keyword=None):
     """
     Return only lines of a file which contains specified keyword.
     """
-    if not path or not os.path.exists(path):
+    if not path or not os.path.isfile(path):
         yield NO_LOGS
         return
     with open(path) as f:
@@ -167,8 +167,9 @@ def get_network_data():
 
 def get_log(path, kw=None):
     s = ''
-    for file in reversed(glob(path + '*')):
-        s += NL.join(grep_file(path, kw))
+    for f in reversed(glob(path + '*')):
+        print(f)
+        s += NL.join(grep_file(f, kw))
     return s
 
 
