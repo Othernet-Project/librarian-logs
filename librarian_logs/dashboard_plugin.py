@@ -31,3 +31,7 @@ class LogsDashboardPlugin(DashboardPlugin):
         with open(logpath, 'rt') as log:
             logs = iter_lines(list(log)[-100:])
         return dict(logs=logs)
+
+    def get_template(self):
+        return 'logs/dashboard'
+
