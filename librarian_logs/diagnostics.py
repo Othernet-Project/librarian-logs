@@ -168,7 +168,6 @@ def get_network_data():
 def get_log(path, kw=None):
     s = ''
     for f in reversed(glob(path + '*')):
-        print(f)
         s += NL.join(grep_file(f, kw))
     return s
 
