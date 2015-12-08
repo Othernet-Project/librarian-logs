@@ -166,6 +166,8 @@ def get_network_data():
 
 
 def get_log(path, kw=None):
+    if not os.path.isfile(path):
+        return NO_LOGS
     s = ''
     for f in reversed(glob(path + '*')):
         s += NL.join(grep_file(f, kw))
