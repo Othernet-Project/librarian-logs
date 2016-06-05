@@ -103,6 +103,13 @@ def find_first(paths):
     return next((p for p in paths if os.path.exists(p)), None)
 
 
+def prefix(s, lst):
+    """
+    Prefix each string in a list with specified string.
+    """
+    return ['{} {}'.format(s, i) for i in lst]
+
+
 # Report generation functions
 
 
@@ -128,21 +135,46 @@ def get_disk_data():
     return NL.join(data)
 
 
+def get_process(procs, binary):
+    """
+    Return 'up' if binary is in the process list, else 'down'
+    """
+    if list(grep(procs, binary)):
+        return 'up'
+    return 'down'
+
+
 def get_proc_data():
     data = []
     psax = shell('ps ax')
-    data.append(NL.join(grep(psax, 'librarian')))
-    data.append(NL.join(grep(psax, 'fsal')))
-    data.append(NL.join(grep(psax, 'ondd')))
-    data.append(NL.join(grep(psax, 'lighttpd')))
-    data.append(NL.join(grep(psax, 'monitor')))
-    data.append(NL.join(grep(psax, 'postgres')))
+    data.append('librarian: {}'.format(
+        get_process(psax, '/usr/bin/librarian')))
+    data.append('fsal: {}'.format(
+        get_process(psax, '/usr/bin/fsal-daemon')))
+    data.append('ondd: {}'.format(
+        get_process(psax, '/usr/sbin/ondd')))
+    data.append('postgres: {}'.format(
+        get_process(psax, '/usr/bin/postgres')))
+    data.append('lighttpd: {}'.format(
+        get_process(psax, '/usr/sbin/lighttpd')))
+    data.append('monitor: {}'.format(
+        get_process(psax, '/usr/bin/monitoring-client')))
+    data.append('hostapd: {}'.format(
+        get_process(psax, '/usr/sbin/hostapd')))
+    data.append('dnsmasq: {}'.format(
+        get_process(psax, '/usr/sbin/dnsmasq')))
+    data.append('dropbear: {}'.format(
+        get_process(psax, '/usr/sbin/dropbear')))
     return NL.join(data)
+
+
+def get_net_info():
+    return shell('ip addr')
 
 
 def get_dmesg():
     """
-    Return last 100 lines of kernel messages.
+    Return syslog
     """
     return shell('dmesg')
 
@@ -182,15 +214,13 @@ def generate_report(syslog, librarian_log, fsal_log, ondd_socket):
     reports.append(section('Platform', get_platform_data()))
     reports.append(section('Memory', get_mem_data()))
     reports.append(section('Processes', get_proc_data()))
-    reports.append(section('Kernel', get_dmesg()))
     reports.append(section('Tuner', get_frontend_data()))
     reports.append(section('Storage', get_disk_data()))
     reports.append(section('Network', get_network_data()))
     reports.append(section('ONDD', get_log(syslog, 'ondd')))
-    reports.append(section('Hotplug', get_log(syslog, 'hotplug')))
-    reports.append(section('Monitor', get_log(syslog, 'outernet.monitor')))
     reports.append(section('Librarian', get_log(librarian_log)))
     reports.append(section('FSAL', get_log(fsal_log)))
+    reports.append(section('Syslog', get_log(syslog)))
     if os.path.exists('/tmp/setup'):
         reports.append(section('Setup', get_log('/tmp/setup')))
     total_time = time.time() - start
